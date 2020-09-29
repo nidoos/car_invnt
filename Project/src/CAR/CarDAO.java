@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class CarDAO {
@@ -51,13 +52,41 @@ public class CarDAO {
 		}
 	}
 
+	public void list() {
+		getConn();
+		System.out.println("====================차량목록====================");
+		System.out.println();
+		String sql = "select count(c_num) from car";
+		try {
+			psmt = conn.prepareStatement(sql);
+			rs= psmt.executeQuery();
+			
+			if(rs.getInt(1)>0) {
+				int num = rs.getInt(1);
+				String c_name = rs.getString(2);
+				String c_brand = rs.getString(3);
+				int grade = rs.getInt(4);
+				System.out.println("등록번호 : "+num+"\t 이름 : "+c_name+"\t 브랜드 :"+c_brand+"\t 등급 : "+grade);
+			}else {
+				System.out.println("차량을 등록하십시오.");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			close();
+		}
+		
+	}
+	
+	
 	public void c_insert() {
 		getConn();
 		try {
-			int choice = 0;
 			System.out.println("차량을 추가 하시겠습니까?");
 			System.out.println("추가[1] 종료[2]");
-			choice = sc.nextInt();
+			int choice = sc.nextInt();
 			if (choice == 1) {
 				do {
 
