@@ -77,57 +77,6 @@ public class CarDAO {
 
 	}
 
-	public void c_insert() {
-		getConn();
-		try {
-			System.out.println("차량을 추가 하시겠습니까?");
-			System.out.println("추가[1] 종료[2]");
-			int choice = sc.nextInt();
-			if (choice == 1) {
-				do {
-
-					System.out.print("차량 이름 : ");
-					c_name = sc.next();
-					System.out.print("출시년도 : ");
-					int year = sc.nextInt();
-					System.out.print("차종 : ");
-					String c_type = sc.next();
-					System.out.print("가격 : ");
-					float price = sc.nextFloat();
-					System.out.print("brand : ");
-					String brand = sc.next();
-
-					String sql = "insert into car values(r_num_seq.nextval,?,?,?,?,?)";
-
-					psmt = conn.prepareStatement(sql);
-					psmt.setString(1, c_name);
-					psmt.setInt(2, year);
-					psmt.setString(3, c_type);
-					psmt.setFloat(4, price);
-					psmt.setString(5, brand);
-
-					int cnt = psmt.executeUpdate();
-
-					if (cnt > 0)
-						System.out.println("추가되었습니다.");
-					else
-						System.out.println("추가에 문제가 생겼습니다.");
-					System.out.println("계속 하시겠습니까?");
-					System.out.println("추가[1] 종료[2]");
-					choice = sc.nextInt();
-				} while (choice == 1);
-				System.out.println("종료되었습니다.");
-			} else
-				System.out.println("종료되었습니다.");
-		} catch (Exception e) {
-			System.out.println("insert 오류");
-			e.printStackTrace();
-		} finally {
-			close();
-		}
-
-	}
-
 	public void c_in() {
 		boolean isOk = true;
 		getConn();
@@ -187,38 +136,9 @@ public class CarDAO {
 
 	}
 
-	public void c_ovr() {
+	public void c_invn() {
 		getConn();
-		try {
-			System.out.println("차량을 추가 하시겠습니까?");
-			System.out.println("추가[1] 종료[2]");
-			int choice = sc.nextInt();
-			if (choice == 1) {
-				do {
-
-					System.out.print("차량 이름 : ");
-					c_name = sc.next();
-
-					String sql = "select count(c_name) from car where c_name=?";
-
-					psmt = conn.prepareStatement(sql);
-					psmt.setString(1, c_name);
-
-					rs = psmt.executeQuery();
-
-					if (rs.getInt(1) > 0) {
-						System.out.println("중복된차량 입니다.");
-					}
-				} while (choice == 1);
-				System.out.println("종료되었습니다.");
-			} else
-				System.out.println("종료되었습니다.");
-		} catch (Exception e) {
-			System.out.println("insert 오류");
-			e.printStackTrace();
-		} finally {
-			close();
-		}
+		
 	}
 
 	public void menu() {
