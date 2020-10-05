@@ -13,6 +13,7 @@ public class CarDAO {
 	PreparedStatement psmt = null;
 	ResultSet rs = null;
 	String c_name;
+	boolean isOk = true;
 
 	public void getConn() {
 		try {// 코딩명령이 실행되었는데 오류떴을때
@@ -78,7 +79,7 @@ public class CarDAO {
 	}
 
 	public void c_in() {
-		boolean isOk = true;
+
 		getConn();
 		int c_invnt = 0;
 		String c_name = null;
@@ -93,29 +94,41 @@ public class CarDAO {
 				System.out.print("추가할 차량의 재고량을 입력하세요 >>>>>>>> ");
 				c_invnt = sc.nextInt();
 
-				String sql = "insert into car values(c_num_seq.nextval, ?,?,?)";
-				psmt = conn.prepareStatement(sql);
+				String sql1 = "select count(c_name) from car where c_name=?";
+				psmt = conn.prepareStatement(sql1);
 				psmt.setString(1, c_name);
-				psmt.setString(2, c_brand);
-				psmt.setInt(3, c_invnt);
-
-				int cnt = psmt.executeUpdate();
-				if (cnt > 0) {
-					System.out.println("정상적으로 입력되셨습니다.");
-				} else {
-					System.out.println("");
-				}
-
-				if (c_invnt == 0) {
-					System.out.println("잘못입력하셨습니다.");
+				rs = psmt.executeQuery();
+				rs.next();
+				if (rs.getInt(1) > 0) {
+					System.out.println(">>>>>> 이미 재고가 있는 차량입니다.");
+					System.out.println(">>>>>> 새로운 차량을 입력해주세요");
 					System.out.println();
 				} else {
-					System.out.println("더 추가하시겠습니까?");
-					System.out.println("[1] 예 \t [2] 아니오");
-					System.out.print(">>>>>>>>>>>>>>>>>>>>>>>");
-					int i = sc.nextInt();
-					if (i == 2) {
-						isOk = false;
+
+					String sql = "insert into car values(c_num_seq.nextval, ?,?,?)";
+					psmt = conn.prepareStatement(sql);
+					psmt.setString(1, c_name);
+					psmt.setString(2, c_brand);
+					psmt.setInt(3, c_invnt);
+
+					int cnt = psmt.executeUpdate();
+					if (cnt > 0) {
+						System.out.println("정상적으로 입력되셨습니다.");
+					} else {
+						System.out.println("");
+					}
+
+					if (c_invnt == 0) {
+						System.out.println("잘못입력하셨습니다.");
+						System.out.println();
+					} else {
+						System.out.println("더 추가하시겠습니까?");
+						System.out.println("[1] 예 \t [2] 아니오");
+						System.out.print(">>>>>>>>>>>>>>>>>>>>>>>");
+						int i = sc.nextInt();
+						if (i == 2) {
+							isOk = false;
+						}
 					}
 
 				}
@@ -138,7 +151,49 @@ public class CarDAO {
 
 	public void c_invn() {
 		getConn();
-		
+
+		try {
+			do {
+				System.out.println("추가할 차량의 등록번호를 입력하세요 >>>>>>>>>>>");
+				int num = sc.nextInt();
+				System.out.println("추가할 채고량을 입력하세요 >>>>>>>>>>>>>>>>>");
+				int invn = sc.nextInt();
+
+				String sql = "insert c_ivnt into car values(?) where c_num = ? ";
+
+				psmt = conn.prepareStatement(sql);
+				psmt.setInt(1, num);
+				psmt.setInt(2, invn);
+
+				int cnt = psmt.executeUpdate();
+				if (cnt > 0) {
+					System.out.println("재고가 성공적으로 추가되었습니다.");
+				} else {
+					System.out.println();
+				}
+
+				if (cnt == 0) {
+					System.out.println("재고를 잘못 입력하셨습니다.");
+					System.out.println();
+				} else {
+					System.out.println("재고를 더 추가하시겠습니까?");
+					System.out.println("[1] 예    [2] 아니오");
+					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>");
+					int i = sc.nextInt();
+					if (i == 2) {
+						isOk = false;
+					}
+				}
+
+			} while (isOk);
+		} catch (Exception e) {
+			System.out.println("재고추가 오류");
+
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+
 	}
 
 	public void menu() {
