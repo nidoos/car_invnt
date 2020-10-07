@@ -25,5 +25,6 @@ minvalue 1;
 insert into CAR values (c_num_seq.nextval, 	'VENUE', 'HYUNDAI', 1);
 insert into car values (c_num_seq.nextval, 'SELTOS','KIA', 2);
 insert into car values (c_num_seq.nextval, 'X3','BMW', 3);
+insert c_ivnt into car
 
 select * from car;
