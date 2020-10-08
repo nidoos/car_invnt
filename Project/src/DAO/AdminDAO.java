@@ -1,4 +1,4 @@
-package CAR;
+package DAO;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
-public class CarDAO {
+public class AdminDAO {
 	Scanner sc = new Scanner(System.in);
 	Connection conn = null;
 	PreparedStatement psmt = null;
@@ -55,7 +55,7 @@ public class CarDAO {
 
 	public void list() {
 		getConn();
-		System.out.println("=================================차량목록=================================");
+		System.out.println("=================================목록=================================");
 		String sql = "select rpad(c_num,15,' ')as c_num, rpad(c_name,15,' ') as c_name, rpad(c_brand,15,' ') as c_brand, c_ivnt from car";
 		try {
 			psmt = conn.prepareStatement(sql);
@@ -86,31 +86,43 @@ public class CarDAO {
 				System.out.print("추가할 차량의 등록번호를 입력하세요 >>>>>>>>>>>");
 				int num = sc.nextInt();
 				System.out.print("추가할 채고량을 입력하세요 >>>>>>>>>>>>>>>>>");
-				int invn = sc.nextInt();
+				int ivnt = sc.nextInt();
 
-				String sql = "insert c_ivnt into car values";
-
-				psmt = conn.prepareStatement(sql);
-				psmt.setInt(1, invn);
-				psmt.setInt(2, num);
-
-				int cnt = psmt.executeUpdate();
-				if (cnt > 0) {
-					System.out.println("재고가 성공적으로 추가되었습니다.");
-				} else {
-					System.out.println();
-				}
-
-				if (cnt == 0) {
-					System.out.println("재고를 잘못 입력하셨습니다.");
+				String sql1 = "select count(c_num) from car where c_num=?";
+				psmt = conn.prepareStatement(sql1);
+				psmt.setInt(1, num);
+				rs = psmt.executeQuery();
+				rs.next();
+				if (rs.getInt(1) == 0) {
+					System.out.println("존재하지 않는 차량입니다. 차량 등록번호를 다시 입력해주세요");
 					System.out.println();
 				} else {
-					System.out.println("재고를 더 추가하시겠습니까?");
-					System.out.println("[1] 예    [2] 아니오");
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>");
-					int i = sc.nextInt();
-					if (i == 2) {
-						isOk = false;
+
+					String sql2 = "update car set c_ivnt=c_ivnt+? where c_num=? ";
+					psmt = conn.prepareStatement(sql2);
+					psmt.setInt(1, ivnt);
+					psmt.setInt(2, num);
+
+					int cnt = psmt.executeUpdate();
+					if (cnt > 0) {
+						System.out.println();
+						System.out.println("재고가 성공적으로 추가되었습니다.");
+					} else {
+						System.out.println();
+					}
+
+					if (cnt == 0) {
+						System.out.println("재고를 잘못 입력하셨습니다.");
+						System.out.println();
+					} else {
+						System.out.println();
+						System.out.println("재고를 더 추가하시겠습니까?");
+						System.out.println("[1] 예    [2] 아니오");
+						System.out.print(">>>>>>>>>>>>>>>>>>>>>>>");
+						int i = sc.nextInt();
+						if (i == 2) {
+							isOk = false;
+						}
 					}
 				}
 
@@ -124,7 +136,7 @@ public class CarDAO {
 		}
 
 	}
-	
+
 	public void c_in() {
 
 		getConn();
@@ -197,7 +209,7 @@ public class CarDAO {
 	}
 
 	public void order() {
-		//산 사람, 담당자, 차 이름, 브랜드, 주소
+		// 산 사람, 담당자, 차 이름, 브랜드, 주소
 	}
 
 	public void a_menu() {
@@ -208,13 +220,70 @@ public class CarDAO {
 		System.out.print(">>>>>>>>>>>>>>>>>  ");
 	}
 
-	
-	
+	public void join() {
+		getConn();
+		try {
+			System.out.println();
+			System.out.println("=============회원가입=============");
+			String sql = "insert into admin values (?,?,?)";
+			String a_id = sc.next();
+			String a_pw = sc.next();
+			String a_name = sc.next();
+
+			psmt = conn.prepareStatement(sql);
+			psmt.setString(1, a_id);
+			psmt.setString(2, a_pw);
+			psmt.setString(3, a_name);
+			
+			int cnt=psmt.executeUpdate();
+			if(cnt>0) {
+				System.out.println("회원가입에 성공하셨습니다.");
+			}else {
+				System.out.println("회원가입에 실패하셨습니다.");
+			}
+			
+			
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	public void login() {
 		getConn();
-		
-		System.out.println("");
-		
+		try {
+			do {
+				System.out.print("아이디를 입력하세요 >>>>> ");
+				String a_id = sc.next();
+				System.out.print("패스워드를 입력하세요 >>>>> ");
+				String a_pw = sc.next();
+
+				String sql = "select count(a_id), count(a_pw) from user_t where a_id=? and u_pw=?";
+				psmt = conn.prepareStatement(sql);
+				psmt.setString(1, a_id);
+				psmt.setString(2, a_pw);
+				psmt.executeQuery();
+				rs.next();
+				if (rs.getInt(1) == 0) {
+					System.out.println("아이디를 잘못입력하셨습니다.");
+					System.out.println();
+				} else if (rs.getInt(2) == 0) {
+					System.out.println("비밀번호를 잘못입력하셨습니다.");
+					System.out.println();
+				} else {
+					isOk = false;
+				}
+
+			} while (isOk);
+		}
+
+		catch (Exception e) {
+			System.out.println("로그인 오류");
+			e.printStackTrace();
+		} finally {
+			close();
+		}
 	}
-	
 }
