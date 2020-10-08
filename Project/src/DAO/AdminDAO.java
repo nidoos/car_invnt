@@ -260,20 +260,24 @@ public class AdminDAO {
 				System.out.print("패스워드를 입력하세요 >>>>> ");
 				String a_pw = sc.next();
 
-				String sql = "select count(a_id), count(a_pw) from user_t where a_id=? and u_pw=?";
+				String sql = "select count(a_id), count(a_pw) from user_t where u_id=? and u_pw=?";
 				psmt = conn.prepareStatement(sql);
 				psmt.setString(1, a_id);
 				psmt.setString(2, a_pw);
-				psmt.executeQuery();
-				rs.next();
-				if (rs.getInt(1) == 0) {
-					System.out.println("아이디를 잘못입력하셨습니다.");
-					System.out.println();
-				} else if (rs.getInt(2) == 0) {
-					System.out.println("비밀번호를 잘못입력하셨습니다.");
-					System.out.println();
-				} else {
-					isOk = false;
+				rs=psmt.executeQuery();
+				while (rs.next()) {
+					rs.getString(1);
+					rs.getString(2);
+
+					if (rs.getInt(1) == 0) {
+						System.out.println("아이디를 잘못입력하셨습니다.");
+						System.out.println();
+					} else if (rs.getInt(2) == 0) {
+						System.out.println("비밀번호를 잘못입력하셨습니다.");
+						System.out.println();
+					} else {
+						isOk = false;
+					}
 				}
 
 			} while (isOk);
