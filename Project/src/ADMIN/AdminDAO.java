@@ -1,4 +1,4 @@
-package DAO;
+package ADMIN;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -226,27 +226,47 @@ public class AdminDAO {
 			System.out.println();
 			System.out.println("=============회원가입=============");
 			String sql = "insert into admin values (?,?,?)";
-			String a_id = sc.next();
-			String a_pw = sc.next();
-			String a_name = sc.next();
+			do {
+				System.out.print("아이디를 입력하세요 : ");
+				String a_id = sc.next();
 
-			psmt = conn.prepareStatement(sql);
-			psmt.setString(1, a_id);
-			psmt.setString(2, a_pw);
-			psmt.setString(3, a_name);
-			
-			int cnt=psmt.executeUpdate();
-			if(cnt>0) {
-				System.out.println("회원가입에 성공하셨습니다.");
-			}else {
-				System.out.println("회원가입에 실패하셨습니다.");
-			}
-			
-			
-			
+				String sql1 = "select a_id from admin where a_id=?";
+				psmt = conn.prepareStatement(sql1);
+				psmt.setString(1, a_id);
+				rs = psmt.executeQuery();
+				if (rs.next() == false) {
+					System.out.print("패스워드를 입력하세요 : ");
+					String a_pw = sc.next();
+					System.out.print("이름을 입력하세요 : ");
+					String a_name = sc.next();
+					
+					psmt = conn.prepareStatement(sql);
+					psmt.setString(1, a_id);
+					psmt.setString(2, a_pw);
+					psmt.setString(3, a_name);
+					int cnt = psmt.executeUpdate();
+
+					if (cnt > 0) {
+						System.out.println("회원가입에 성공하셨습니다.");
+						System.out.println();
+						isOk = false;
+					} else {
+						System.out.println("회원가입에 실패하셨습니다.");
+						System.out.println();
+					}
+
+				}else {
+					System.out.println("이미 존재하는 아이디가 있습니다.");
+					System.out.println();
+				}
+
+			} while (isOk);
+
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			System.out.println("회원가입 오류");
 			e.printStackTrace();
+		} finally {
+			close();
 		}
 
 	}
@@ -260,24 +280,35 @@ public class AdminDAO {
 				System.out.print("패스워드를 입력하세요 >>>>> ");
 				String a_pw = sc.next();
 
-				String sql = "select count(a_id), count(a_pw) from user_t where u_id=? and u_pw=?";
+				String sql = "select a_id, a_pw from admin where a_id=? and a_pw=?";
 				psmt = conn.prepareStatement(sql);
 				psmt.setString(1, a_id);
 				psmt.setString(2, a_pw);
-				rs=psmt.executeQuery();
+				rs = psmt.executeQuery();
 				while (rs.next()) {
 					rs.getString(1);
 					rs.getString(2);
 
-					if (rs.getInt(1) == 0) {
+					if (rs.getString(1).equals(a_id)) {
+						if (!rs.getString(2).equals(a_pw)) {
+							System.out.println("비밀번호를 잘못입력하셨습니다.");
+							System.out.println();
+						}
+					} else {
 						System.out.println("아이디를 잘못입력하셨습니다.");
 						System.out.println();
-					} else if (rs.getInt(2) == 0) {
-						System.out.println("비밀번호를 잘못입력하셨습니다.");
-						System.out.println();
-					} else {
-						isOk = false;
 					}
+					isOk = false;
+
+				}
+				String sql1 = "select a_name from admin where a_id=?";
+				psmt = conn.prepareStatement(sql1);
+				psmt.setString(1, a_id);
+				rs = psmt.executeQuery();
+				while (rs.next()) {
+					System.out.println();
+					System.out.println(rs.getString("a_name") + "사장님 환영합니다!");
+
 				}
 
 			} while (isOk);
